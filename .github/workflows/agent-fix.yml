@@ -1,0 +1,78 @@
+# Example only: this workflow has not been run. It expects a repository secret ANTHROPIC_API_KEY (an Anthropic API key)
+# and uses the job's own GITHUB_TOKEN for git and gh. Nothing runs until a maintainer adds the secret.
+#
+# Triggers
+#   - an issue gets the label "agent-fix"  -> the fix agent works on that issue, then the review agent comments on its PR
+#   - nightly, and by hand                 -> the test suite runs; if it fails, the fix agent works on the failing tests
+name: agent-fix
+
+on:
+  issues:
+    types: [labeled]
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write        # push the agent's branch
+  pull-requests: write   # open the PR, post the review comment
+  issues: read
+
+concurrency:
+  group: agent-fix
+  cancel-in-progress: false
+
+jobs:
+  fix-and-review:
+    if: github.event_name != 'issues' || github.event.label.name == 'agent-fix'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      PIPELINE_TEST_CMD: python -m pytest -q
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install pytest and Claude Code
+        run: |
+          pip install -r requirements-dev.txt
+          npm install -g @anthropic-ai/claude-code
+      - name: Git identity for the agent's commits
+        run: |
+          git config user.name "fix-agent[bot]"
+          git config user.email "fix-agent@users.noreply.github.com"
+
+      - name: Nightly - is the suite red?
+        id: suite
+        if: github.event_name != 'issues'
+        run: |
+          if python -m pytest -q; then echo "red=false" >> "$GITHUB_OUTPUT"; else echo "red=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Fix agent (issue)
+        if: github.event_name == 'issues'
+        run: python pipeline/fix_agent.py --github-issue ${{ github.event.issue.number }}
+      - name: Fix agent (failing tests)
+        if: github.event_name != 'issues' && steps.suite.outputs.red == 'true'
+        run: python pipeline/fix_agent.py --failing-test tests
+
+      - name: Review agent
+        if: success() && (github.event_name == 'issues' || steps.suite.outputs.red == 'true')
+        run: |
+          pr=$(gh pr list --author "@me" --state open --json number,headRefName \
+               --jq '[.[] | select(.headRefName | startswith("agent/fix-"))][0].number')
+          if [ -n "$pr" ]; then python pipeline/review_agent.py --pr "$pr"; fi
+
+      - name: Keep the run logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-runs
+          path: runs/

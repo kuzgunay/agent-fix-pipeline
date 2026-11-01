@@ -104,7 +104,7 @@ def main() -> int:
 
         ok = agent["exit_code"] == 0 and after["passed"] and red.get("fails_without_fix") is True
         if not ok:
-            reason = ("agent failed" if agent["exit_code"] else "suite fails after the change" if not after["passed"]
+            reason = (f"agent failed: {agent['result'].strip()[:160]}" if agent["exit_code"] else "suite fails after the change" if not after["passed"]
                       else red.get("reason") or "the new tests pass without the fix")
             log.event("end", outcome="no_pr", reason=reason, exit_code=1)
             print(f"no PR: {reason}; log runs/{log.run_id}.jsonl")

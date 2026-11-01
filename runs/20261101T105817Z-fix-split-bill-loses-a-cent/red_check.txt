@@ -1,0 +1,18 @@
+test_divides_exactly (tests.test_split.SplitEvenlyTest.test_divides_exactly) ... ok
+test_one_person (tests.test_split.SplitEvenlyTest.test_one_person) ... ok
+test_rejects_no_people (tests.test_split.SplitEvenlyTest.test_rejects_no_people) ... ok
+test_remainder_is_not_lost (tests.test_split.SplitEvenlyTest.test_remainder_is_not_lost) ... FAIL
+
+======================================================================
+FAIL: test_remainder_is_not_lost (tests.test_split.SplitEvenlyTest.test_remainder_is_not_lost)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>\tests\test_split.py", line 13, in test_remainder_is_not_lost
+    self.assertEqual(sum(shares), 1000)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: 999 != 1000
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+FAILED (failures=1)

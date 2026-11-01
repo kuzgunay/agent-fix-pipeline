@@ -1,0 +1,9 @@
+The bug is fixed and all 12 tests in the suite now pass.
+
+Root cause: `split_evenly` in `ledger/split.py` worked out each share with floor division (`total_cents // people`) and threw away the remainder. So 1000 cents split 3 ways gave three shares of 333, which add up to 999. Amounts that divide evenly, like 900 / 3, have no remainder, which is why they looked fine.
+
+Fix: the function now uses `divmod(total_cents, people)` and gives one extra cent to the first `remainder` people. The shares always add up to the total and never differ by more than one cent, which is what the function's docstring already promised. Splitting 10.00 between 3 now gives 3.34, 3.33 and 3.33.
+
+Test added: `test_remainder_is_not_lost` in `tests/test_split.py`. It splits 1000 cents between 3 people and checks there are 3 shares, that they add up to 1000, and that the largest and smallest differ by at most 1. Before the fix it failed with `999 != 1000`, the lost cent from the report.
+
+The only files changed are `ledger/split.py` and `tests/test_split.py`. No existing tests were modified.

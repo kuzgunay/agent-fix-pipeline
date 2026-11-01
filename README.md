@@ -125,9 +125,17 @@ Full test outputs, the agent's summary and the PR body sit next to it in `runs/<
 It assumes a repository secret `ANTHROPIC_API_KEY` and uses the job's `GITHUB_TOKEN`. **This repository does not include
 an API key and the workflow has not been run here.** Add the secret to try it.
 
-## A real run
+## Evidence
 
-See [Evidence](#evidence) below.
+A real run on this repository, 2026-11-01 (logs committed under `runs/`):
+
+| Step | Result | Log |
+|---|---|---|
+| Fix agent on `issues/001-split-loses-a-cent.md` | test written first, fix in `ledger/split.py`; suite 11 → 12 tests, all pass; red check: the new test FAILS with the fix taken out (999 != 1000); [PR #1](https://github.com/kuzgunay/agent-fix-pipeline/pull/1) opened by the pipeline. 7 turns, 36 s. | `runs/20261101T105817Z-fix-split-bill-loses-a-cent.jsonl` |
+| Review agent on PR #1 | separate read-only session; re-ran the suite and the red check itself; [verdict APPROVE](https://github.com/kuzgunay/agent-fix-pipeline/pull/1#issuecomment-6557029755). 2 turns, 12.5 s. | `runs/20261101T105909Z-review-agent-fix-split-bill-loses-a-cent-202611.jsonl` |
+| An earlier attempt | the agent could not authenticate; the pipeline opened no PR and logged why. Kept as an example of the failure path. | `runs/20261101T103618Z-fix-split-bill-loses-a-cent.jsonl` |
+
+PR #1 stays open on purpose: merging is a person's step. Issues 002 and 003 are left for you to try.
 
 ## Limits
 

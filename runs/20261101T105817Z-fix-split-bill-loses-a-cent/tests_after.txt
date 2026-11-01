@@ -1,0 +1,17 @@
+test_clamps_to_month_end (tests.test_dates.AddMonthsTest.test_clamps_to_month_end) ... ok
+test_crosses_year (tests.test_dates.AddMonthsTest.test_crosses_year) ... ok
+test_february (tests.test_dates.DaysInMonthTest.test_february) ... ok
+test_thirty_day_months (tests.test_dates.DaysInMonthTest.test_thirty_day_months) ... ok
+test_total_and_due_date (tests.test_invoice.InvoiceTest.test_total_and_due_date) ... ok
+test_format (tests.test_money.FormatCentsTest.test_format) ... ok
+test_surrounding_spaces (tests.test_money.ToCentsTest.test_surrounding_spaces) ... ok
+test_whole_and_half_amounts (tests.test_money.ToCentsTest.test_whole_and_half_amounts) ... ok
+test_divides_exactly (tests.test_split.SplitEvenlyTest.test_divides_exactly) ... ok
+test_one_person (tests.test_split.SplitEvenlyTest.test_one_person) ... ok
+test_rejects_no_people (tests.test_split.SplitEvenlyTest.test_rejects_no_people) ... ok
+test_remainder_is_not_lost (tests.test_split.SplitEvenlyTest.test_remainder_is_not_lost) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.001s
+
+OK
